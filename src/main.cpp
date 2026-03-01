@@ -41,6 +41,7 @@ uint8_t  LOK_ADRESSE = 0xBF; //	1011 1111	Trinär Weichenadresse
 //***********************************
 //***********************************
 						
+//***********************************
 //uint8_t  LOK_ADRESSE = 0xCC; //	11001100	Trinär
 //									
 //uint8_t  LOK_ADRESSE = 0x4C; //	0100 1100	Trinär//
@@ -630,8 +631,6 @@ ISR(TIMER2_COMPA_vect) // // Schaltet Impuls an MOTOROUT LO wenn speed
                {
                   if (lokadresseB == LOK_ADRESSE)
                   {
-                     
-                     
                      //OSZI_A_LO();
                      // Daten uebernehmen
                      
