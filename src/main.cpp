@@ -35,9 +35,11 @@
 //#include "adc.c"
 #define TW_STATUS   (TWSR & TW_STATUS_MASK)
 
+volatile uint8_t weichencode = 0; // indiv. Code der Weiche: 2 bits
+
 //***********************************
 //***********************************
-uint8_t  LOK_ADRESSE = 0xBF; //	1011 1111	Trinär Weichenadresse
+volatile uint8_t  LOK_ADRESSE = 0xBF; //	1011 1111	Trinär Weichenadresse
 //***********************************
 //***********************************
 						
@@ -154,7 +156,10 @@ volatile uint8_t   lokstatus=0x00; // Funktion, Richtung
 
 volatile uint8_t   oldlokdata = 0;
 volatile uint8_t   lokdata = 0;
-volatile uint8_t   deflokdata = 0;
+volatile uint8_t   defweichendata = 0;
+volatile uint8_t   lastweichendata = 0;
+
+uint8_t changeweichendata = 0;
 //volatile uint16_t   newlokdata = 0;
 
 volatile uint8_t   rawdataA = 0;
@@ -652,160 +657,40 @@ ISR(TIMER2_COMPA_vect) // // Schaltet Impuls an MOTOROUT LO wenn speed
                         ledstatus |= (1<<LED_CHANGEBIT); // led-change setzen
                         
                      }
-                     // deflokdata aufbauen
+                     // defweichendata aufbauen
                      for (uint8_t i=0;i<8;i++)
                      {
                         //if ((rawdataB & (1<<(2+i))))
                         if ((rawdataB & (1<<i)))
                         {
-                           deflokdata |= (1<<i);
+                           defweichendata |= (1<<i);
                         }
                         else 
                         {
-                           deflokdata &= ~(1<<i);
+                           defweichendata &= ~(1<<i);
                         }
                      }
                      
                      
-                     // Richtung
-                     if (deflokdata == 0x03) // Wert 1, > Richtung togglen
-                     {
-                        if (!(lokstatus & (1<<RICHTUNGBIT))) // Start Richtungswechsel
+                     
+                       
+                        
+                        // defweichendata fuer Weichen decodieren
+                        if(defweichendata ^ weichencode) // Aenderung
                         {
-                           lokstatus |= (1<<RICHTUNGBIT); // Vorgang starten, speed auf 0 setzen
-                           richtungcounter = 0;
-                           //oldspeed = speed; // behalten
-                           //speed = 0;
-                           
-                           lokstatus |= (1<<LOK_CHANGEBIT); // lok-change setzen
-                           ledstatus |= (1<<LED_CHANGEBIT); // led-change setzen
-                           
-                        } // if !(lokstatus & (1<<RICHTUNGBIT)
-                        
-                        
-                        /* TODO
-                         else // repetition 0x03
-                         {
-                         richtungcounter++;
-                         if (richtungcounter > 4)
-                         {
-                         lokstatus &= ~(1<<RICHTUNGBIT); // Vorgang Richtungsbit wieder beenden, 
-                         richtungcounter = 0;
-                         }
-                         }
-                         */
-                     } // deflokdata == 0x03
-                     else 
-                     {  
-                        
-                        lokstatus &= ~(1<<RICHTUNGBIT); // Vorgang Richtungsbit wieder beenden, 
-                        
-                        {
+                           changeweichendata = lastweichendata ^ weichencode; // Aenderungen speichern
                            
                            
-                           switch (deflokdata)
-                           {
-                              case 0:
-                                 
-                                 speedcode = 0;
-                                 lokstatus &= ~(1<<STARTBIT);
-                                 break;
-                              case 0x0C:
-                                 
-                                 speedcode = 1;
-                                 break;
-                              case 0x0F:
-                                 
-                                 speedcode = 2;
-                                 break;
-                              case 0x30:
-                                 speedcode = 3;
-                                 break;
-                              case 0x33:
-                                 speedcode = 4;
-                                 break;
-                              case 0x3C:
-                                 speedcode = 5;
-                                 break;
-                              case 0x3F:
-                                 speedcode = 6;
-                                 break;
-                              case 0xC0:
-                                 speedcode = 7;
-                                 break;
-                              case 0xC3:
-                                 speedcode = 8;
-                                 break;
-                              case 0xCC:
-                                 speedcode = 9;
-                                 break;
-                              case 0xCF:
-                                 speedcode = 10;
-                                 break;
-                              case 0xF0:
-                                 speedcode = 11;
-                                 break;
-                              case 0xF3:
-                                 speedcode = 12;
-                                 break;
-                              case 0xFC:
-                                 speedcode = 13;
-                                 break;
-                              case 0xFF:
-                                 speedcode = 14;
-                                 break;
-                              default:
-                                 speedcode = 0;
-                                 break;
-                                 
-                           }
-                           //OSZI_B_HI();
-                           // MARK: speed                            
-                           newspeed = speedlookup[speedcode]; // zielwert
-                           
-                           // Startbedingung
-                           if(speedcode && (speedcode ==1) && !(lokstatus & (1<<STARTBIT))  && !(lokstatus & (1<<RUNBIT))) // noch nicht gesetzt
-                           {
-                              
-                              startspeed = speedlookup[speedcode] + STARTIMPULS; // kleine Zugabe
-                              
-                              lokstatus |= (1<<STARTBIT);
-                              
-                           }// ok
-                           //
-                           
-                           oldspeed = speed; // behalten
-                           
-                           
-                           speedintervall = (newspeed - speed)>>2; // 4 teile
-                           if((speedintervall == 0) )
-                           {
-                              //OSZI_B_LO();
-                              speedintervall = 1;
-                              //OSZI_B_HI();
-                           }
-                           
-                           
-                           
-                           if(speedcode > 0)
-                           {
-                              lokstatus |= (1<<RUNBIT); // lok in bewegung
-                           }
-                           else
-                           {
-                              lokstatus &= ~(1<<RUNBIT); // lok steht still
-                              
-                           }
-                           
+                           lastweichendata = defweichendata;
                         }
-                     }
+                     
                      //SYNC_HI();
                   }
                   else 
                   {
                      // aussteigen
                      //deflokadresse = 0;
-                     //deflokdata = 0xCA;
+                     //defweichendata = 0xCA;
                      INT0status = 0;
                      return;
                   }
@@ -815,7 +700,7 @@ ISR(TIMER2_COMPA_vect) // // Schaltet Impuls an MOTOROUT LO wenn speed
                {
                   lokstatus &= ~(1<<ADDRESSBIT);
                   // aussteigen
-                  //deflokdata = 0xCA;
+                  //defweichendata = 0xCA;
                   INT0status = 0;
                   return;
                   
