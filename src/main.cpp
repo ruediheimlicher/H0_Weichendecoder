@@ -20,10 +20,10 @@
 #include <stdint.h>
 #include <util/twi.h>
 
-#include <Wire.h>
-#include <U8g2lib.h>
+//#include <Wire.h>
+//#include <U8g2lib.h>
 
-U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+//U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
 
 #include "lcd.c"
@@ -915,7 +915,8 @@ int main (void)
       ledonpin = LAMPEA_PIN;
       ledoffpin = LAMPEB_PIN;
    }
-
+   
+   //u8g2.begin();
   
    sei();
    
@@ -1141,10 +1142,21 @@ int main (void)
             LOOPLEDPORT ^= (1<<LOOPLED); 
             
             loopcount0=0;
- 
+
+            lcd_gotoxy(0,1);
+            lcd_putint(speed);
+            lcd_gotoxy(0,2);
+            lcd_putint(deffunktion);
+            /*
+            u8g2.clearBuffer();
+            u8g2.drawStr(0,10,"Test");
+            u8g2.sendBuffer();
+            */
             // Takt for display
-             // MARK: LCD loop Display
+            //  LCD loop Display
+            
             displaycounter1++;
+
             displaycounter1 = 0;
             if (displaycounter1 > 0x02)
             {
