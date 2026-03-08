@@ -526,7 +526,16 @@ uint8_t frac  : Anzahl der Nachkommastellen
 	lcd_puts(dat);
 }
 
-
+void lcd_hextobin(uint8_t hexzahl)
+{
+   
+    // Convert hex to binary string
+    for (int i = 7; i >= 0; i--) 
+    {
+        lcd_putc((hexzahl & (1 << i)) ? '1' : '0');
+    }
+    
+}
 
  
 void lcd_put_frac(unsigned char* dat, uint8_t start, uint8_t komma, uint8_t frac) 

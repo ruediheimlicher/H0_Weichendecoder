@@ -8,50 +8,49 @@
 #ifndef defines_h
 #define defines_h
 
+#define MAX_EEPROM      512
 #define SHORT 0 // Abstand im doppelpaket
 #define LONG 2 // Abstand zwischen Daten
 
 #define OSZIPORT   PORTD      // Ausgang fuer Servo
 #define OSZIDDR      DDRD
 
-
-
-#define INT_0     4
+#define OSZI_PULS_A        6
+#define OSZI_PULS_B        7
+#define SYNC               0
 
 #define PAKETA   0
 #define PAKETB   1
-
-#define OSZI_PULS_A        6
-#define OSZI_PULS_B        7
-#define SYNC               4
 
 #define OSZI_A_LO() OSZIPORT &= ~(1<<OSZI_PULS_A)
 #define OSZI_A_HI() OSZIPORT |= (1<<OSZI_PULS_A)
 #define OSZI_A_TOGG()  OSZIPORT ^= (1<<OSZI_PULS_A)
 
-#define SYNC_LO() OSZIPORT &= ~(1<<SYNC)
+#define OSZIALO OSZIPORT &= ~(1<<OSZIA)
+#define OSZIAHI OSZIPORT |= (1<<OSZIA)
+#define OSZIATOG OSZIPORT ^= (1<<OSZIA)
 
+#define SYNC_LO() OSZIPORT &= ~(1<<SYNC)
+#define SYNC_HI() OSZIPORT |= (1<<SYNC)
 
 #define OSZI_B_LO() OSZIPORT &= ~(1<<OSZI_PULS_B)
 #define OSZI_B_HI() OSZIPORT |= (1<<OSZI_PULS_B)
 #define OSZI_B_TOGG() OSZIPORT ^= (1<<OSZI_PULS_B)
 
-#define SYNC_HI() OSZIPORT |= (1<<SYNC)
-
-
-
 #define TESTPORT        PORTB
-#define TESTDDR        DDRB
+#define TESTDDR         DDRB
+#define TESTPIN         PINB
 
 #define TEST0     0
 #define TEST1     1
-
 
 // Bits displaydata
 #define SPEEDCODE 0
 #define SPEED     1
 
-#define STARTIMPULS 2
+#define STARTINDEX 3 // Index fuer Anlauf
+
+#define STARTKICK 10 // Verlaengerung erster Puls
 
 // bits displaystatus
 #define DISPLAY_GO   7
@@ -82,19 +81,19 @@
 #define FIRSTRUNBIT     0
 #define LOOPBIT         1
 
-#define ADDRESSBIT   0
+// lokstatus
+#define ADDRESSBIT      0
 #define STARTBIT        1 // Startimpuls
-#define DATABIT      2
+#define DATABIT         2
 #define PROGBIT         3 // Programmiermodus
-#define FUNKTIONBIT  4
-#define RUNBIT  5
-#define RICHTUNGBIT  6
-#define LOK_CHANGEBIT       7  
+#define FUNKTIONBIT     4
+#define RUNBIT          5
+#define RICHTUNGBIT     6
+#define LOK_CHANGEBIT   7  
 
-
-#define STARTDELAY      100
-
-#define STARTWAIT 100
+// defines fuer richtungstatus
+#define RICHTUNGCHANGESTARTBIT  0
+#define RICHTUNGCHANGEOKBIT  1
 
 
 #define TRIT0 0
@@ -113,7 +112,6 @@
 #define INT0_PAKET_A 4
 #define INT0_PAKET_B 5
 
-
 #define LAMPEPORT PORTC
 #define LAMPEDDR  DDRC
 #define LAMPEPIN   PINC
@@ -122,17 +120,19 @@
 #define LAMPEA_PIN      1 
 #define LAMPEB_PIN      0
 
+#define MAX_EEPROM      512
 
-#define LAMPE         3
-#define MEM           6 // Eingang fuer last richtung (Kondensator)
+//#define LAMPE         3
 
-#define LAMPEMAX 0x40 // 50%
-
-#define FIRSTRUN_END 80
+//#define LAMPEMAX 0x40 // 50%
 
 #define FIRSTRUN_END 80
+
 
 #define MAXLOOP0 0x0AFE
 #define MAXLOOP1 0x0AFF
+
+
+
 
 #endif /* defines_h */
