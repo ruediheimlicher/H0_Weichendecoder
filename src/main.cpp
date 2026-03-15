@@ -52,7 +52,7 @@ BOD-Level auf 2.7V eingestellt. Efuse 0xFD
 
 //***********************************
 						
-uint8_t   LOK_ADRESSE = 0xCC;    //   11001100	Trinär mit Adresse 20 20 * DIP 1100
+uint8_t   LOK_ADRESSE = 0x0F;    //   11001100	Trinär mit Adresse 20 20 * DIP 1100
 
 //uint8_t LOK_ADRESSE = 0xBF; // Weiche 
 
@@ -921,7 +921,7 @@ int main (void)
    
 	while (1)
    {  
-      OSZI_B_TOGG();
+      //OSZI_B_TOGG();
       // Timing: loop: 40 us, takt 85us, mit if-teil 160 us
       wdt_reset();
         // firstrun
